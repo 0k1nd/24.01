@@ -2,6 +2,11 @@ from pydantic import BaseModel
 import uvicorn
 from fastapi import FastAPI
 import requests
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 app = FastAPI()
 
@@ -17,7 +22,17 @@ app = FastAPI()
 
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
+    site_id = os.getenv("SITE_ID")
+    client_api_id = os.getenv("CLIENTAPILD")
+    
+    if site_id is None or client_api_id is None:
+        return {"error": "SITE_ID or CLIENTAPILD environment variables are not set."}
+    
+    return {
+        "site_id": site_id,
+        "client_api_id": client_api_id,
+        "message": "Hello, World!"
+    }
 
 
 
@@ -35,8 +50,9 @@ def get_calltouch(
         "clientApiId": clientApiId,
         "dateFrom": dateFrom,
         "dateTo": dateTo,
+        "withCallTags": True,
         "page": page,
-        "limit": limit
+        "limit": limit,
     }
     
     try:
